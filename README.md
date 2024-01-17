@@ -1,0 +1,4 @@
+- [x] Receber o texto e a imagem (jpg | jpeg | png)
+- [x] Fazer upload da imagem
+- [ ] Criar o pdf utilizando o texto e a imagem salva como background
+- [ ] Retornar o pdf criado
