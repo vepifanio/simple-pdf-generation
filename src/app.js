@@ -60,12 +60,31 @@ function generateNewPdf({ content, backgroundImageUrl }) {
   doc.pipe(pdfFile);
 
   if (backgroundImageUrl) {
-    doc.image(path.resolve('tmp', backgroundImageUrl).toString());
+    const backgroundImagePathString = path.resolve('tmp', backgroundImageUrl).toString();
+    doc.image(backgroundImagePathString, 0, 0, {
+      cover: [doc.page.width, doc.page.height],
+    });
   }
 
-  doc.fontSize(25).text(content, 100, 100);
+  doc.fontSize(25).text(
+    content,
+    0,
+    doc.page.height / 2,
+    {
+      width: doc.page.width,
+      align: 'center',
+    },
+  );
 
   doc.end();
+
+  return pdfFile;
+}
+
+function deleteFile(fileUrl) {
+  fs.unlink(fileUrl, (err) => {
+    if (err) throw err;
+  });
 }
 
 app.post('/create-pdf', handleUploadFile, (req, res) => {
@@ -79,12 +98,22 @@ app.post('/create-pdf', handleUploadFile, (req, res) => {
 
   const backgroundImageUrl = req.file ? path.resolve('tmp', req.file.filename) : undefined;
 
-  generateNewPdf({
+  const pdfGenerated = generateNewPdf({
     content,
     backgroundImageUrl,
   });
 
-  return res.send();
+  if (backgroundImageUrl) {
+    deleteFile(backgroundImageUrl);
+  }
+
+  const pdfFileName = pdfGenerated.path.split('/').at(-1);
+
+  return res.sendFile(pdfFileName, { root: path.resolve(__dirname, '..', 'pdf') }, (err) => {
+    if (err) {
+      throw new Error('Error sending file:', err);
+    }
+  });
 });
 
 module.exports = { app };
