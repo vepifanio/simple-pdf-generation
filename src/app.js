@@ -1,5 +1,8 @@
 const express = require('express');
 const multer = require('multer');
+const PDFDocument = require('pdfkit');
+const fs = require('fs');
+const path = require('path');
 
 const app = express();
 app.use(express.json());
@@ -48,6 +51,23 @@ const handleUploadFile = (req, res, next) => {
   });
 };
 
+function generateNewPdf({ content, backgroundImageUrl }) {
+  const doc = new PDFDocument({
+    layout: 'landscape',
+  });
+  const pdfFile = fs.createWriteStream(path.resolve('pdf', 'test.pdf'));
+
+  doc.pipe(pdfFile);
+
+  if (backgroundImageUrl) {
+    doc.image(path.resolve('tmp', backgroundImageUrl).toString());
+  }
+
+  doc.fontSize(25).text(content, 100, 100);
+
+  doc.end();
+}
+
 app.post('/create-pdf', handleUploadFile, (req, res) => {
   const { content } = req.body;
 
@@ -56,6 +76,13 @@ app.post('/create-pdf', handleUploadFile, (req, res) => {
       error: "'content' field is missing",
     });
   }
+
+  const backgroundImageUrl = req.file ? path.resolve('tmp', req.file.filename) : undefined;
+
+  generateNewPdf({
+    content,
+    backgroundImageUrl,
+  });
 
   return res.send();
 });
