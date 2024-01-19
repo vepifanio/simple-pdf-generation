@@ -1,10 +1,12 @@
 const express = require('express');
+const cors = require('cors');
 const path = require('path');
 const { uploadImageFileMiddleware } = require('./upload-img-file-middleware');
 const { PUBLIC_FOLDER_PATH_STRING } = require('./consts');
 const { generateNewPdf } = require('./generate-new-pdf');
 
 const app = express();
+app.use(cors());
 app.use(express.static('public'));
 app.use(express.json());
 
@@ -29,11 +31,16 @@ app.post('/create-pdf', uploadImageFileMiddleware, (req, res) => {
 
     const pdfFileName = pdfGenerated.path.split('/').at(-1);
 
-    return res.sendFile(pdfFileName, { root: path.resolve(__dirname, '..', 'pdf') }, (err) => {
-      if (err) {
-        throw new Error('Error sending file:', err);
-      }
-    });
+    return res.sendFile(
+      pdfFileName,
+      { root: path.resolve(__dirname, '..', 'pdf') },
+      (err) => {
+        if (err) {
+          console.error(err);
+          throw new Error('Error sending file:', err);
+        }
+      },
+    );
   } catch (error) {
     return res.status(500).json(error);
   }
