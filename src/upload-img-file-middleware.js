@@ -18,7 +18,8 @@ const fileFilter = (req, file, callback) => {
 const storage = multer.diskStorage({
   destination: 'public',
   filename: (req, file, callback) => {
-    callback(null, file.originalname);
+    const timestamp = Date.now();
+    callback(null, `${timestamp}-${file.originalname}`);
   },
 });
 
