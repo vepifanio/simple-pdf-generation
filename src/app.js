@@ -18,7 +18,8 @@ const create = pdfsController.create.bind(pdfsController);
 const getOne = pdfsController.getOne.bind(pdfsController);
 
 app.get('/pdfs', index);
-app.get('/pdfs/generate/:id', getOne);
-app.post('/pdfs/create', uploadImageFileMiddleware, create);
+app.post('/pdfs', uploadImageFileMiddleware, create);
+
+app.get('/pdfs/:id/generate', getOne);
 
 module.exports = { app };
