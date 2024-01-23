@@ -2,7 +2,7 @@ const PDFDocument = require('pdfkit');
 const fs = require('fs');
 const path = require('path');
 
-const generateNewPdf = ({ id, content, backgroundImageUrl }) => {
+const generateNewPdf = ({ id, content, backgroundImageURL }) => {
   const doc = new PDFDocument({
     layout: 'landscape',
   });
@@ -13,8 +13,8 @@ const generateNewPdf = ({ id, content, backgroundImageUrl }) => {
 
   doc.pipe(pdfFile);
 
-  if (backgroundImageUrl) {
-    const backgroundImagePath = path.resolve(backgroundImageUrl);
+  if (backgroundImageURL) {
+    const backgroundImagePath = path.resolve(backgroundImageURL);
 
     doc.image(backgroundImagePath.toString(), 0, 0, {
       cover: [doc.page.width, doc.page.height],
@@ -34,9 +34,9 @@ const generateNewPdf = ({ id, content, backgroundImageUrl }) => {
   doc.end();
 
   const baseURL = 'http://localhost:3333';
-  const serverPdfPath = `${baseURL}/${fileName}`;
+  const serverPdfUrl = `${baseURL}/${fileName}`;
 
-  return serverPdfPath;
+  return serverPdfUrl;
 };
 
 module.exports = {
